@@ -60,7 +60,8 @@ app.get('api/test/helloWorld', async(req,res,next)=>{
   console.log("HELLO WORLD")
 })
 
-app.listen(3000, () => console.log(`Running...`))
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Running...`))
 
 async function authMiddleware(req, res, next) {
   const endpoint = req.url.split('/')
