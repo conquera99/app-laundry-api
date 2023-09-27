@@ -21,7 +21,7 @@ const insertHTransactionSQL = `INSERT INTO h_trans
   (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 `
 
-const insertDTransSQL = `INSERT INTO d_trans (d_trans_id, d_trans_create_id, d_trans_create_ip, d_trans_update_id, d_trans_update_ip, d_trans_note, d_trans_quantity, d_trans_subtotal, d_trans_status, FK_h_product_id, FK_h_trans_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)`
+const insertDTransSQL = `INSERT INTO d_trans (d_trans_id, d_trans_create_id, d_trans_create_ip, d_trans_update_id, d_trans_update_ip, d_trans_note, d_trans_quantity, d_trans_subtotal, d_trans_estimation, d_trans_status, FK_h_product_id, FK_h_trans_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`
 
 //  const insertDTransactionSQL =
 
@@ -51,7 +51,7 @@ router.get('/get/:id?', async (req, res, next) => {
       header.h_trans_products = productRows
 
       // jasa
-      const jasaQuery = `SELECT h.*, e.*, d.d_trans_done FROM d_trans d join h_product h on h.h_product_id = d.FK_h_product_id left join h_employee e on e.h_employee_id = d.FK_h_employee_id WHERE h_product_type = 'jasa' AND d_trans_status = 1 AND FK_h_trans_id = '${header.h_trans_id}'`
+      const jasaQuery = `SELECT h.*, e.*,d.d_trans_estimation, d.d_trans_done FROM d_trans d join h_product h on h.h_product_id = d.FK_h_product_id left join h_employee e on e.h_employee_id = d.FK_h_employee_id WHERE h_product_type = 'jasa' AND d_trans_status = 1 AND FK_h_trans_id = '${header.h_trans_id}'`
       const [jasaRows] = await connection.query(jasaQuery)
       header.h_trans_jasas = jasaRows
 
@@ -163,6 +163,7 @@ router.post('/create', async (req, res, next) => {
           note ? note : null,
           parseInt(product.qty),
           parseInt(product.subtotal),
+          0,
           1,
           product.id,
           hTransId,
@@ -189,6 +190,9 @@ router.post('/create', async (req, res, next) => {
         const jasa = jasa_list[i]
 
         const dTransId = await generateUserID(connection, 'd_trans', 'D')
+
+        //console.log(`dTransId = ${dTransId}, employee_id = ${req.loggedEmployee.employee_id}, ip = ${ip}, note = ${note}, jasa.subtotal = ${jasa.subtotal}, jasa.estimation = ${jasa.estimation}, jasa.id = ${jasa.id}, hTransId = ${hTransId}`)
+
         await connection.query(insertDTransSQL, [
           dTransId,
           req.loggedEmployee.employee_id,
@@ -198,6 +202,7 @@ router.post('/create', async (req, res, next) => {
           note ? note : null,
           1,
           parseInt(jasa.subtotal),
+          parseInt(jasa.estimation),
           1,
           jasa.id,
           hTransId,
@@ -233,7 +238,7 @@ router.post('/create', async (req, res, next) => {
       header.h_trans_products = productRows
 
       // jasa
-      const jasaQuery = `SELECT h.*, e.*, d.d_trans_done FROM d_trans d join h_product h on h.h_product_id = d.FK_h_product_id left join h_employee e on e.h_employee_id = d.FK_h_employee_id WHERE h_product_type = 'jasa' AND d_trans_status = 1 AND FK_h_trans_id = '${header.h_trans_id}'`
+      const jasaQuery = `SELECT h.*, e.*, d.d_trans_estimation, d.d_trans_done FROM d_trans d join h_product h on h.h_product_id = d.FK_h_product_id left join h_employee e on e.h_employee_id = d.FK_h_employee_id WHERE h_product_type = 'jasa' AND d_trans_status = 1 AND FK_h_trans_id = '${header.h_trans_id}'`
       const [jasaRows] = await connection.query(jasaQuery)
       header.h_trans_jasas = jasaRows
 

@@ -106,16 +106,17 @@ const createDTransTableSQL = `CREATE TABLE d_trans (
   d_trans_done BOOLEAN DEFAULT 0,
   d_trans_quantity INT NOT NULL,
   d_trans_subtotal BIGINT(20) NOT NULL,
+  d_trans_estimation INT NOT NULL,
   d_trans_status BOOLEAN NOT NULL,
   FK_h_product_id VARCHAR(12) NOT NULL,
   FK_h_employee_id VARCHAR(12) DEFAULT NULL,
   FK_h_trans_id VARCHAR(11) NOT NULL
 )`
-const insertDTransSQL = `INSERT INTO d_trans (d_trans_id, d_trans_create_id, d_trans_create_date, d_trans_create_ip, d_trans_update_id, d_trans_update_date, d_trans_update_ip, d_trans_note, d_trans_done, d_trans_quantity, d_trans_subtotal, d_trans_status, FK_h_product_id, FK_h_employee_id, FK_h_trans_id) VALUES ?`
-const initialDTransSQL = `INSERT INTO d_trans (d_trans_id, d_trans_create_id, d_trans_create_date, d_trans_create_ip, d_trans_update_id, d_trans_update_date, d_trans_update_ip, d_trans_note, d_trans_done, d_trans_quantity, d_trans_subtotal, d_trans_status, FK_h_product_id, FK_h_employee_id, FK_h_trans_id) VALUES
-('D0410220001', 'E0000000001', '2022-10-04', '::1',  'E0000000001', '2022-10-04', '::1', NULL, 0, 1, 150000, 1, 'HP1209220001', NULL, 'T0410220001'),
-('D0410220002', 'E0000000001', '2022-10-04', '::1',  'E0000000001', '2022-10-04', '::1', NULL, 0, 1, 75000, 1, 'HP3107220002', NULL, 'T0410220001'),
-('D0410220003', 'E0000000001', '2022-10-04', '::1',  'E0000000001', '2022-10-04', '::1', NULL, 0, 1, 70000, 1, 'HP3107220002', 'HE1209220002', 'T0410220002')`
+const insertDTransSQL = `INSERT INTO d_trans (d_trans_id, d_trans_create_id, d_trans_create_date, d_trans_create_ip, d_trans_update_id, d_trans_update_date, d_trans_update_ip, d_trans_note, d_trans_done, d_trans_quantity, d_trans_subtotal, d_trans_estimation, d_trans_status, FK_h_product_id, FK_h_employee_id, FK_h_trans_id) VALUES ?`
+const initialDTransSQL = `INSERT INTO d_trans (d_trans_id, d_trans_create_id, d_trans_create_date, d_trans_create_ip, d_trans_update_id, d_trans_update_date, d_trans_update_ip, d_trans_note, d_trans_done, d_trans_quantity, d_trans_subtotal, d_trans_estimation, d_trans_status, FK_h_product_id, FK_h_employee_id, FK_h_trans_id) VALUES
+('D0410220001', 'E0000000001', '2022-10-04', '::1',  'E0000000001', '2022-10-04', '::1', NULL, 0, 1, 150000, 0, 1, 'HP1209220001', NULL, 'T0410220001'),
+('D0410220002', 'E0000000001', '2022-10-04', '::1',  'E0000000001', '2022-10-04', '::1', NULL, 0, 1, 75000, 0, 1, 'HP3107220002', NULL, 'T0410220001'),
+('D0410220003', 'E0000000001', '2022-10-04', '::1',  'E0000000001', '2022-10-04', '::1', NULL, 0, 1, 70000, 0, 1, 'HP3107220002', 'HE1209220002', 'T0410220002')`
 
 // HTrans
 const dropHTransTableSQL = 'DROP TABLE IF EXISTS h_trans'
@@ -232,7 +233,8 @@ const initialHProductSQL = `INSERT INTO h_product (h_product_id, h_product_name,
 ('HP1209220001', 'Tali Sepatu', 'produk', 150000, 'nike', 'aksesoris', 'E0000000001', '2022-09-12', '::1', 'E0000000001', '2022-09-12', '::1', 'data dummy', 1, 1, 'P1209220001'),
 ('HP1209220002', 'Steam Dry', 'jasa', 60000, NULL, 'drying', 'E0000000001', '2022-09-12', '::1', 'E0000000001', '2022-09-12', '::1', 'data dummy', 1, 0, 'P1209220002'),
 ('HP3107220001', 'Wax', 'produk', 25000, 'kiwi', 'habis pakai', 'E0000000001', '2022-07-31', '192.168.18.36', 'E0000000001', '2022-07-31', '192.168.18.36', NULL, 1, 0, 'P3107220001'),
-('HP3107220002', 'Deep Wash', 'jasa', 75000, NULL, 'washing', 'E0000000001', '2022-07-31', '192.168.18.36', 'E0000000001', '2022-07-31', '192.168.18.36', NULL, 1, 1, 'P3107220002')`
+('HP3107220002', 'Deep Wash', 'jasa', 75000, NULL, 'washing', 'E0000000001', '2022-07-31', '192.168.18.36', 'E0000000001', '2022-07-31', '192.168.18.36', NULL, 1, 1, 'P3107220002'),
+('HP3107220003', 'Repaint Sepatu', 'jasa', 75000, NULL, 'repaint', 'E0000000001', '2022-07-31', '192.168.18.36', 'E0000000001', '2022-07-31', '192.168.18.36', NULL, 1, 1, 'P3107220003')`
 
 // Product
 const dropProductTableSQL = 'DROP TABLE IF EXISTS product'
@@ -259,7 +261,8 @@ const initialProductSQL = `INSERT INTO product (product_id, product_name, produc
 ('P1209220001', 'Tali Sepatu', 'produk', 150000, 'nike', 50, 'aksesoris', 'E0000000001', '2022-09-12', '::1', 'E0000000001', '2022-09-12', '::1', 'data dummy', 1),
 ('P1209220002', 'Steam Dry', 'jasa', 60000, NULL, 5, 'drying', 'E0000000001', '2022-09-12', '::1', 'E0000000001', '2022-09-12', '::1', 'data dummy', 1),
 ('P3107220001', 'Wax', 'produk', 25000, 'kiwi', 50, 'habis pakai', 'E0000000001', '2022-07-31', '192.168.18.36', 'E0000000001', '2022-09-12', '192.168.18.36', NULL, 1),
-('P3107220002', 'Deep Wash', 'jasa', 75000, NULL, 10, 'washing', 'E0000000001', '2022-07-31', '192.168.18.36', 'E0000000001', '2022-09-12', '192.168.18.36', NULL, 1)`
+('P3107220002', 'Deep Wash', 'jasa', 75000, NULL, 10, 'washing', 'E0000000001', '2022-07-31', '192.168.18.36', 'E0000000001', '2022-09-12', '192.168.18.36', NULL, 1),
+('P3107220003', 'Repaint Sepatu', 'jasa', 75000, NULL, 10, 'repaint', 'E0000000001', '2022-07-31', '192.168.18.36', 'E0000000001', '2022-09-12', '192.168.18.36', NULL, 1)`
 
 // Employee
 const dropEmployeeTableSQL = 'DROP TABLE IF EXISTS employee'

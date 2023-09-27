@@ -17,8 +17,8 @@ const insertHCustomerSQL = `INSERT INTO h_customer
   h_customer_status, FK_customer_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
 `
 
-const updateCustomerSQL = `UPDATE customer SET customer_name=?, customer_phone_number=?, customer_email=?, customer_address=?, customer_create_id=?, customer_create_ip=?, customer_update_id=?, customer_update_ip=?, customer_note=?, customer_status=? WHERE customer_id=?`
-const updateHCustomerSQL = `UPDATE h_customer SET h_customer_name=?, h_customer_phone_number=?, h_customer_email=?, h_customer_address=?, h_customer_update_ip=?, h_customer_update_date=?, h_customer_note=?, h_customer_status=? WHERE FK_customer_id=? AND h_employee_status = 1`
+const updateCustomerSQL = `UPDATE customer SET customer_name=?, customer_phone_number=?, customer_email=?, customer_address=?, customer_update_id=?, customer_update_ip=?, customer_note=?, customer_status=? WHERE customer_id=?`
+const updateHCustomerSQL = `UPDATE h_customer SET h_customer_name=?, h_customer_phone_number=?, h_customer_email=?, h_customer_address=?, h_customer_update_ip=?, h_customer_update_date=?, h_customer_note=?, h_customer_status=? WHERE FK_customer_id=? AND h_customer_status = 1`
 
 router.get('/get/:id?', async (req, res, next) => {
   const retVal = {
@@ -76,6 +76,9 @@ router.post('/create', async (req, res, next) => {
     const h_id = await generateUserID(connection, 'h_customer', 'HC')
 
     // Inserting h_customer
+
+    console.log(insertHCustomerSQL)
+
     await connection.query(insertHCustomerSQL, [
       h_id,
       name,
@@ -88,6 +91,7 @@ router.post('/create', async (req, res, next) => {
       ip,
       note ? note : null,
       1,
+      id,
     ])
 
     // Select created customer for return value
@@ -131,8 +135,8 @@ router.put('/update/:id', async (req, res, next) => {
       phone_number,
       email,
       address,
+      req.loggedEmployee.employee_id,
       ip,
-      new Date(),
       note ? note : oldCustomer.customer_note,
       true,
       req.params.id,
@@ -140,6 +144,10 @@ router.put('/update/:id', async (req, res, next) => {
 
     const [history] = await connection.query(
       `SELECT * FROM h_customer where FK_customer_id = '${req.params.id}' AND h_customer_status = 1`
+    )
+
+    const[customers] = await connection.query(
+      `SELECT * FROM customer where customer_id = '${req.params.id}'`
     )
 
     const hCustomer = history[0]
@@ -152,23 +160,28 @@ router.put('/update/:id', async (req, res, next) => {
       const h_customerId = await generateUserID(connection, 'h_customer', 'HE')
       await connection.query(insertHCustomerSQL, [
         h_customerId,
-        name ? name : customer[0].customer_name,
-        customer[0].customer_username,
+        name ? name : customers[0].customer_name,
+        customers[0].customer_phone_number,
+        customers[0].customer_email,
+        customers[0].customer_address,
         req.loggedEmployee.customer_id,
         ip,
         req.loggedEmployee.customer_id,
         ip,
-        note ? note : customer[0].customer_note,
+        note ? note : customers[0].customer_note,
+        true,
         req.params.id,
       ])
     } else {
       await connection.query(updateHCustomerSQL, [
-        name ? name : customer[0].customer_name,
-        customer[0].customer_username,
-        req.loggedEmployee.customer_id,
-        new Date(),
+        name ? name : customers[0].customer_name,
+        customers[0].customer_phone_number,
+        customers[0].customer_email,
+        customers[0].customer_address,
         ip,
+        new Date(),
         note ? note : null,
+        true,
         req.params.id,
       ])
     }

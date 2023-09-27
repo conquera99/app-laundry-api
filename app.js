@@ -70,7 +70,7 @@ async function authMiddleware(req, res, next) {
     console.log(endpoint[3])
     try {
       const token = req.headers.auth_token
-
+      
       if (!token){
         console.log("Invalid Token")
         return res.status(401).json({ status: 401, message: 'Unauthorized' })

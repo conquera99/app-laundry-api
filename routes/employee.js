@@ -334,6 +334,8 @@ router.put('/update/:id', async (req, res, next) => {
         throwError(400, 'Privileges tidak valid.', '', true)
       }
 
+      let actionType = 'insert'
+
       if(privilege!=undefined){
         const found = userPrivileges.find(
           (employeePrivilege) => employeePrivilege.FK_privilege_id == privilege
@@ -350,7 +352,7 @@ router.put('/update/:id', async (req, res, next) => {
           id: privilege,
           type: actionType,
         })
-      } 
+      }
     }
 
     for (var i = 0; i < userPrivileges.length; i++) {

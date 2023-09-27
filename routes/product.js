@@ -12,8 +12,8 @@ VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
 
 const insertHProductSQL = `INSERT INTO h_product
 (h_product_id, h_product_name, h_product_type, h_product_price, h_product_brand, h_product_category, h_product_create_id, h_product_create_ip,
- h_product_update_id, h_product_update_ip, h_product_note, h_product_status, FK_product_id)
-VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+ h_product_update_id, h_product_update_ip, h_product_update_date, h_product_note, h_product_status, FK_product_id)
+VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 `
 
 const updateProductSQL = `UPDATE product SET product_name=?, product_type=?, product_price=?,
@@ -82,6 +82,7 @@ router.post('/create', async (req, res, next) => {
 
   const connection = await db.getConnection()
   try {
+    console.log('priv', req.loggedPrivileges);
     privilegeChecks(req.loggedPrivileges, requiredPrivileges, req.loggedIsAdmin)
     inputChecks(requiredInputs, req.body)
 
@@ -122,6 +123,7 @@ router.post('/create', async (req, res, next) => {
       create_ip,
       req.loggedEmployee.employee_id,
       create_ip,
+      new Date(),
       note ? note : null,
       1,
       id,
