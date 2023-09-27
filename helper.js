@@ -82,7 +82,7 @@ function privilegeChecks(privileges, requiredPrivileges, isAdmin) {
         (item) => item.privilege_name.toLowerCase() === privilege
       )
     ) {
-      return throwError(403, 'Forbidden Access')
+      return throwError(403, `Forbidden Access: ${privilege}`)
     }
   }
 }

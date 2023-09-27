@@ -82,7 +82,7 @@ router.post('/create', async (req, res, next) => {
 
   const connection = await db.getConnection()
   try {
-    console.log('priv', req.loggedPrivileges);
+    console.log('priv', req.loggedPrivileges.map((item) => item.privilege_name));
     privilegeChecks(req.loggedPrivileges, requiredPrivileges, req.loggedIsAdmin)
     inputChecks(requiredInputs, req.body)
 
